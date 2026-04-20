@@ -1,0 +1,118 @@
+﻿@{
+    ViewData["Title"] = "Members";
+}
+@model List<MemberModel>
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="container mt-4">
+    <h4 id="roomState">Add Member</h4>
+    <div class="card shadows-sm p-4">
+        <form id="roomForm" form asp-controller="Members" asp-action="AddMember" method="post">
+            <div class="row align-items-end">
+                
+                <input type="hidden" id="MemberId" name="Id" />
+
+                <div class="form-group mb-3 col">
+                    <label for="Name">Name</label>
+                    <input type="text" class="form-control" id="Name" name="Name" placeholder=""/>
+                </div>
+                
+                <div class="form-group mb-3 col">
+                    <label for="Level">Level</label>
+                    <input type="number" class="form-control" id="Level" name="Level" min="0" max="10" placeholder=""/>
+                </div>
+                
+                <div class="form-group mb-3 col">
+                    <label for="Height">Height</label>
+                    <input type="number" class="form-control" id="Height" name="Height" min="100" max="220" placeholder=""/>
+                </div>
+                
+                <div class="form-group mb-3 col">
+                    <label for="Weight">Weight</label>
+                    <input type="number" class="form-control" id="Weight" name="Weight" min="30" max="220" placeholder=""/>
+                </div>
+                
+                <div class="form-group mb-3 col">
+                    <label for="Age">Age</label>
+                    <input type="number" class="form-control" id="Age" name="Age" min="10" max="120" placeholder=""/>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <button type="submit" class="btn btn-primary w-100">Submit</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="container mt-5">
+    <h4>All Members</h4>
+    <table class="table table-striped table-bordered">
+        <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Level</th>
+            <th scope="col">Height</th>
+            <th scope="col">Weight</th>
+            <th scope="col">Age</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var member in Model)
+        {
+            <tr>
+                <td>@member.Name</td>
+                <td>@member.Level</td>
+                <td>@member.Height</td>
+                <td>@member.Weight</td>
+                <td>@member.Age</td>
+                <td>
+                    <button 
+                        class="btn btn-primary" 
+                        onclick="editMember(this)"
+                        data-id="@member.Id"
+                        data-name="@member.Name"
+                        data-level="@member.Level"
+                        data-height="@member.Height"
+                        data-weight="@member.Weight"
+                        data-age="@member.Age">
+                        Edit
+                    </button>
+                </td>
+                <td>
+                    <button class="btn btn-danger" onclick="if(confirm('Delete this member?')) deleteMember(@member.Id)">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+    function editMember(button) {
+        document.getElementById("roomState").innerHTML = "Edit Member";
+
+        document.getElementById("MemberId").value = button.dataset.id;
+        document.getElementById("Name").value = button.dataset.name;
+        document.getElementById("Level").value = button.dataset.level;
+        document.getElementById("Height").value = button.dataset.height;
+        document.getElementById("Weight").value = button.dataset.weight;
+        document.getElementById("Age").value = button.dataset.age;
+
+        document.getElementById("roomForm").action = "/Home/Members/EditMember";
+    }
+    
+    function deleteMember(id) {
+        fetch('/Home/Members/DeleteMember?id=' + id, {
+            method: 'POST'
+        }).then(data => location.reload());
+    }
+</script>

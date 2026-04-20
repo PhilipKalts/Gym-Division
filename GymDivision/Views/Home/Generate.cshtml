@@ -1,0 +1,120 @@
+﻿@{
+    ViewData["Title"] = "Generate Rooms";
+}
+<h1>@ViewData["Title"]</h1>
+
+@model GymDivision.Controllers.GenerateViewModel
+
+<button class="btn btn-primary" onclick="generate()">Results</button>
+
+<div id="results" class="mt-4"></div>
+
+<div id="pickMembers" class="row">
+    @foreach (var member in Model.Members)
+    {
+        <div class="col-md-2 mb-3">
+            <div class="card p-3 h-100">
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <div><strong>@member.Name</strong></div>
+                        <div class="text-muted">Level: @member.Level</div>
+                    </div>
+
+                    <button id="@member.Id button" class="btn btn-outline-primary btn-sm"
+                            onclick="addMember(@member.Id)">
+                        ➕ Add
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    }
+</div>
+
+
+<script>
+    const selectedMembers = [];
+    
+    function addMember(id) {
+        const button = document.getElementById(id + " button");
+        
+        if (!selectedMembers.includes(id)) {
+            selectedMembers.push(id);
+            button.innerHTML = '✅ Added';
+        }
+        else{
+            selectedMembers.splice(selectedMembers.indexOf(id), 1);
+            button.innerHTML = '➕ Add';
+        }
+    }
+    
+    function generate() {
+        url = "";
+        isFirst = true;
+        for (const member of selectedMembers) {
+            if (!isFirst) {
+                url += "&";
+            }
+            isFirst = false;
+            url += "memberIds=" + member;
+        }
+        
+        fetch("/Home/Generate/Generate?" + url, {
+            method: "GET",
+        })
+        .then(response => response.json()).then(data => renderRooms(data));
+    }
+
+    function renderRooms(rooms) {
+        document.getElementById("pickMembers").style.display = "none";
+        const results = document.getElementById("results");
+        results.innerHTML = "";
+
+        rooms.forEach((room, index) => {
+
+            let membersHtml = "";
+
+            for (const m of room.members) {
+                membersHtml += `
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>${m.name}</strong>
+                        <div class="text-muted small">Level ${m.level}</div>
+                    </div>
+                </li>
+            `;
+            }
+
+            results.innerHTML += `
+            <div class="card shadow-sm mb-3">
+                
+                <div class="card-header d-flex justify-content-between">
+                    <h4>
+                        Room ${index + 1}
+                    </h4>
+                    <div>
+                        <span class="badge bg-primary">
+                            Ideal: ${room.roomSizeIdeal}
+                        </span>
+                        <span class="badge bg-warning text-dark">
+                            Min: ${room.roomSizeMin}
+                        </span>
+                        <span class="badge bg-danger">
+                            Max: ${room.roomSizeMax}
+                        </span>
+                    </div>
+                </div>
+
+                <ul class="list-group list-group-flush">
+                    ${membersHtml}
+                </ul>
+
+                <div class="card-footer text-muted">
+                    Members in room: ${room.members.length}
+                </div>
+            </div>
+        `;
+        });
+    }
+</script>

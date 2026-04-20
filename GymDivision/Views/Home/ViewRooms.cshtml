@@ -1,0 +1,98 @@
+﻿@{
+    ViewData["Title"] = "Rooms";
+}
+@model List<RoomModel>
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="container mt-4">
+    <h4 id="roomState">Add Room</h4>
+    <div class="card shadows-sm p-4">
+        <form id="roomForm" form asp-controller="Rooms" asp-action="AddRoom" method="post">
+            <div class="row align-items-end">
+                
+                <input type="hidden" id="RoomId" name="Id" />
+
+                <div class="form-group mb-3 col">
+                    <label for="MinMembers">Min Members</label>
+                    <input type="number" class="form-control" id="MinMembers" name="MinMembers" min="0" max="100" placeholder=""/>
+                </div>
+
+                <div class="form-group mb-3 col">
+                    <label for="MaxMembers">Max Members</label>
+                    <input type="number" class="form-control" id="MaxMembers" name="MaxMembers" min="0" max="100" placeholder=""/>
+                </div>
+
+                <div class="form-group mb-3 col">
+                    <label for="IdealMembers">Ideal Members</label>
+                    <input type="number" class="form-control" id="IdealMembers" name="IdealMembers" min="0" max="100" placeholder=""/>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <button type="submit" class="btn btn-primary w-100">Submit</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<div class="container mt-5">
+    <table class="table table-striped table-bordered">
+        <h4>All Rooms</h4>
+        <thead>
+        <tr>
+            <th>Id</th>
+            <th>Min Trainees</th>
+            <th>Max Trainees</th>
+            <th>Ideal Trainees</th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var room in Model)
+        {
+            <tr>
+                <td>@room.Id</td>
+                <td>@room.MinMembers</td>
+                <td>@room.MaxMembers</td>
+                <td>@room.IdealMembers</td>
+                <td><button class="btn btn-primary" onclick="editMember(@room.Id)">Edit</button></td>
+                <td>
+                    <button class="btn btn-danger" onclick="if(confirm('Delete this room?')) deleteRoom(@room.Id)">
+                        Delete
+                    </button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+    function editMember(id) {
+        document.getElementById('roomState').innerText = 'Edit Room: ' + id;
+        const row = event.target.closest('tr');
+        
+        const min = row.children[1].innerText;
+        const max = row.children[2].innerText;
+        const ideal = row.children[3].innerText;
+        
+        document.getElementById('RoomId').value = id;
+        document.getElementById('MinMembers').value = min;
+        document.getElementById('MaxMembers').value = max;
+        document.getElementById('IdealMembers').value = ideal;
+
+        const form = document.getElementById("roomForm");
+        form.action = '/Home/Rooms/EditRoom';
+    }
+    
+    function deleteRoom(id) {
+        fetch('/Home/Rooms/RemoveRoom?id=' + id, {
+            method: 'POST',
+        }).then(response => location.reload());
+    }
+</script>
