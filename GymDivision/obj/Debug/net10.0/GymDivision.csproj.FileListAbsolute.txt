@@ -212,3 +212,4 @@ D:\Rider Projects\GymDivision\GymDivision\bin\Debug\net10.0\runtimes\win-x64\nat
 D:\Rider Projects\GymDivision\GymDivision\bin\Debug\net10.0\runtimes\win-x86\native\e_sqlite3.dll
 D:\Rider Projects\GymDivision\GymDivision\obj\Debug\net10.0\GymDivision.csproj.AssemblyReference.cache
 D:\Rider Projects\GymDivision\GymDivision\obj\Debug\net10.0\GymDivis.3AC9C112.Up2Date
+D:\Rider Projects\GymDivision\GymDivision\obj\Debug\net10.0\GymDivision.sourcelink.json

@@ -10,21 +10,19 @@ public struct MemberDistributor(int totalMembers, RoomSeparationData[] roomSepar
     /// Get the results from the array which returns
     /// </summary>
     /// <returns></returns>
-    public RoomSeparationData[] GetDistribution()
+    public void SetDistribution()
     {
         int totalIdeal = roomSeparationDatas.Sum(x => x.RoomSizeIdeal);
         int extras = totalMembers - totalIdeal;
         if (extras > 0)
         {
             ExtrasArePositive(extras);
-            return roomSeparationDatas;
+            return;
         }
         
         int totalMin = roomSeparationDatas.Sum(x => x.RoomSizeMin);
         if (totalMin <= totalMembers) ExtrasAreMoreThanCombinedMin(totalMin);
         else ThereAreNotEnoughMinForAllRooms();
-        
-        return roomSeparationDatas;
     }
     
     

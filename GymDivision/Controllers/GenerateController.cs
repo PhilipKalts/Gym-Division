@@ -1,4 +1,5 @@
-﻿using GymDivision.Models;
+﻿using GymDivision.Domain;
+using GymDivision.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GymDivision.Controllers;
@@ -20,6 +21,14 @@ public class GenerateController : Controller
     [HttpGet("Generate")]
     public IActionResult Generate(List<int> memberIds)
     {
+        //TODO: remove after testing
+        bool shouldUseNew = true;
+        {
+            memberIds.Clear();
+            memberIds = new List<int>();
+            for (int i = 0; i <= 18; i++) memberIds.Add(i);
+        }
+        
         if (memberIds.Count == 0) return BadRequest("Member IDs cannot be null or empty");
         
         PopulateMemberData(memberIds);
@@ -28,10 +37,19 @@ public class GenerateController : Controller
             return BadRequest("You entered too many members");
         
         MemberDistributor memberDistributor = new(memberDatas.Count, roomSeparationDatas);
-        roomSeparationDatas = memberDistributor.GetDistribution();
+        memberDistributor.SetDistribution();
+
+        if (shouldUseNew)
+        {
+            RoomPopulator roomPopulator = new(memberDatas, roomSeparationDatas);
+            roomPopulator.SetRoomSeparations();
+        }
+        else
+        {
+            SimpleRoomPopulator simpleRoomPopulator = new(memberDatas, roomSeparationDatas);
+            simpleRoomPopulator.SetResultBasedOnLevel();
+        }
         
-        RoomPopulator roomPopulator = new(memberDatas, roomSeparationDatas);
-        roomSeparationDatas = roomPopulator.GetResult();
         
         return Json(roomSeparationDatas);
     }
