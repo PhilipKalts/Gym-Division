@@ -213,3 +213,6 @@ D:\Rider Projects\GymDivision\GymDivision\bin\Debug\net10.0\runtimes\win-x86\nat
 D:\Rider Projects\GymDivision\GymDivision\obj\Debug\net10.0\GymDivision.csproj.AssemblyReference.cache
 D:\Rider Projects\GymDivision\GymDivision\obj\Debug\net10.0\GymDivis.3AC9C112.Up2Date
 D:\Rider Projects\GymDivision\GymDivision\obj\Debug\net10.0\GymDivision.sourcelink.json
+D:\Rider Projects\GymDivision\GymDivision\bin\Debug\net10.0\package-lock.json
+D:\Rider Projects\GymDivision\GymDivision\bin\Debug\net10.0\package.json
+D:\Rider Projects\GymDivision\GymDivision\obj\Debug\net10.0\compressed\a0rm0tj07y-{0}-rlvz8k62jr-rlvz8k62jr.gz

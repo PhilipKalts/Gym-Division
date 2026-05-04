@@ -5,16 +5,20 @@
 
 @model GymDivision.Controllers.GenerateViewModel
 
-<button class="btn btn-primary" onclick="generate()">Results</button>
+
+<button class="btn btn-primary mt-4" onclick="generate()">Results</button>
+
 
 <div id="results" class="mt-4"></div>
 
+
 <div id="pickMembers" class="row">
+    <h3>Pick Members</h3>
     @foreach (var member in Model.Members)
     {
         <div class="col-md-2 mb-3">
             <div class="card p-3 h-100">
-                
+
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <div><strong>@member.Name</strong></div>
@@ -33,6 +37,38 @@
 </div>
 
 
+<div id="requirements" class="list-group mt-sm-3">
+    <h3>Requirements</h3>
+    <h6>Click to select / deselect requirements!</h6>
+    <h6>Drag & Drop to sort them to your needs!</h6>
+    <div class="list-group-item" data-value="0">Level</div>
+    <div class="list-group-item" data-value="1">Age</div>
+    <div class="list-group-item" data-value="2">Injury</div>
+    <div class="list-group-item" data-value="3">Pair</div>
+</div>
+
+
+<script src="~/js/Sortable.min.js"></script>
+
+
+<script>
+    document.querySelectorAll('#requirements .list-group-item')
+        .forEach(item => {
+            item.addEventListener('click', () => {
+                item.classList.toggle('active');
+            });
+        });
+
+
+    var el = document.getElementById('requirements');
+    var sortable = Sortable.create(el);
+
+    new Sortable(document.getElementById('requirements'), {
+        animation: 150
+    });    
+</script>
+
+
 <script>
     const selectedMembers = [];
     
@@ -43,7 +79,7 @@
             selectedMembers.push(id);
             button.innerHTML = '✅ Added';
         }
-        else{
+        else {
             selectedMembers.splice(selectedMembers.indexOf(id), 1);
             button.innerHTML = '➕ Add';
         }
@@ -60,6 +96,12 @@
             url += "memberIds=" + member;
         }
         
+        const requirementsList = document.querySelectorAll('#requirements .list-group-item.active');
+        const requirementInts = Array.from(requirementsList).map(item => parseInt(item.dataset.value));
+        
+        for (const requirementInt of requirementInts) url += "&requirements=" + requirementInt;
+        console.log(url);
+        
         fetch("/Home/Generate/Generate?" + url, {
             method: "GET",
         })
@@ -68,6 +110,7 @@
 
     function renderRooms(rooms) {
         document.getElementById("pickMembers").style.display = "none";
+        document.getElementById("requirements").style.display = "none";
         const results = document.getElementById("results");
         results.innerHTML = "";
 
@@ -80,7 +123,7 @@
                 <li class="list-group-item d-flex justify-content-between align-items-center">
                     <div>
                         <strong>${m.name}</strong>
-                        <div class="text-muted small">Level ${m.level}</div>
+                        <div class="text-muted small">Level: ${m.level} | Age: ${m.age} | Injury: ${m.injury} | Pair: ${m.pairMember}</div>
                     </div>
                 </li>
             `;
