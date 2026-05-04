@@ -5,7 +5,7 @@ public static class LevelCalculator
     const int maxScore = 100;
     const int scoreLossPerPoint = 20;
     
-    public static int GetLevelScore(Member a, Member b, int weight)
+    public static int GetScore(Member a, Member b, int weight)
     {
         if (weight == 0) return 0;
             

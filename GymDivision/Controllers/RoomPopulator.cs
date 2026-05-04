@@ -10,19 +10,20 @@ public class RoomPopulator(List<MemberModel> allMemberModels, RoomSeparationData
     Room[] allRooms;
     List<MemberModel> allMemberModels = allMemberModels;
     RoomSeparationData[] roomSeparationDatas = roomSeparationDatas;
+    DistributionWeights distributionWeights;
     
-    const int levelWeight = 10;
-
     #endregion
     
     
-    public void SetRoomSeparations()
+    public void SetRoomSeparations(List<RequirementType> types)
     {
         Console.WriteLine("______________________________");
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         int totalMembersInRoomSeparationDatas = roomSeparationDatas.Sum(x => x.MembersToAdd);
         if (allMemberModels.Count != totalMembersInRoomSeparationDatas)
             throw new Exception("Number of members in RoomSeparationData and allMembers are not equal");
+
+        distributionWeights = new DistributionWeights(types);
         
         SetRandomizedRooms();
         ImproveRooms();
@@ -43,7 +44,7 @@ public class RoomPopulator(List<MemberModel> allMemberModels, RoomSeparationData
         {
             allRooms = new Room[roomSeparationDatas.Length];
             for (int i = 0; i < allRooms.Length; i++) 
-                allRooms[i] = new Room(levelWeight);
+                allRooms[i] = new Room(distributionWeights);
         }
 
         void SetMembersToRooms()

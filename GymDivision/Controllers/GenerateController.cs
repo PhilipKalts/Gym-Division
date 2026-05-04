@@ -50,7 +50,7 @@ public class GenerateController : Controller
         if (shouldUseNew)
         {
             RoomPopulator roomPopulator = new(memberDatas, roomSeparationDatas);
-            roomPopulator.SetRoomSeparations();
+            roomPopulator.SetRoomSeparations(requirements);
         }
         else
         {
