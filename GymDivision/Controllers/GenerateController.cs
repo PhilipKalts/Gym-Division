@@ -25,11 +25,6 @@ public class GenerateController : Controller
     public IActionResult Generate(List<int> memberIds, List<RequirementType> requirements)
     {
         //TODO: remove after testing
-        Console.WriteLine(requirements.Count);
-        for (int i = 0; i < requirements.Count; i++)
-        {
-            Console.WriteLine(requirements[i]);
-        }
         bool shouldUseNew = true;
         {
             memberIds.Clear();

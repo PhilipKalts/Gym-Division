@@ -1,59 +1,56 @@
-﻿using GymDivision.Models;
-using GymDivision.ScoreCalculators;
+﻿using GymDivision.ScoreCalculators;
 
 namespace GymDivision;
 
 public class Room
 {
-    public List<Member> AllMembers { get; set; }
-    public HashSet<Injury> Injuries { get; set; }
-    public int Score { get; private set; }
-    public int AverageLevel { get; private set; }
+    #region Fields
 
+    public List<Member> AllMembers { get; set; }
+    public int Score { get; private set; }
+    
     DistributionWeights distributionWeights;
+
+    #endregion
         
+    
     public Room(DistributionWeights distributionWeights)
     {
         this.distributionWeights = distributionWeights;
         AllMembers = new List<Member>();
-        Injuries = new HashSet<Injury>();
     }
         
-        
+    
+    /// <summary>
+    /// Calculate the score of the room and each member inside it
+    /// </summary>
     public void CalculateScores()
     {
         if (AllMembers.Count == 0) return;
 
         Score = 0;
-        int sumLevels = 0;
         
         foreach (Member member in AllMembers)
         {
             member.ScoreInRoom = 0;
-            sumLevels += member.Model.Level;
             for (int i = 0; i < AllMembers.Count; i++)
             {
                 if (member == AllMembers[i]) continue;
-                member.ScoreInRoom += AgeCalculator.GetScore(member, AllMembers[i], distributionWeights.Age);
-                member.ScoreInRoom += PairCalculator.GetScore(member, AllMembers[i], distributionWeights.Pair);
-                member.ScoreInRoom += LevelCalculator.GetScore(member, AllMembers[i], distributionWeights.Level);
-                member.ScoreInRoom += InjuryCalculator.GetScore(member, AllMembers[i], distributionWeights.Injury);
+                member.ScoreInRoom = GetScoreFromCalculations(member, AllMembers[i]);
             }
         }
 
-        AverageLevel = sumLevels / AllMembers.Count;
         Score = AllMembers.Sum(member => member.ScoreInRoom);
     }
-        
     
-    public void SetInjuries()
-    {
-        Injuries.Clear();
-        for (int i = 0; i < AllMembers.Count; i++)
-            Injuries.Add(AllMembers[i].Model.Injury);
-    }
 
-
+    /// <summary>
+    /// Calculate the potential score change in the room from a swap
+    /// </summary>
+    /// <param name="memberToSwap"></param>
+    /// <param name="memberToSwapWith"></param>
+    /// <returns></returns>
+    /// <exception cref="Exception"></exception>
     public int GetPossibleScoreForSwap(Member memberToSwap, Member memberToSwapWith)
     {
         if (!AllMembers.Contains(memberToSwap)) 
@@ -70,22 +67,48 @@ public class Room
             // The interaction between members goes both ways in the total Score
             // A -> B & B -> A
             // That is why we multiply by 2.
-            potentialScore -= AgeCalculator.GetScore(memberToSwap, member, distributionWeights.Age) * 2;
-            potentialScore -= PairCalculator.GetScore(memberToSwap, member, distributionWeights.Pair) * 2;
-            potentialScore -= LevelCalculator.GetScore(memberToSwap, member, distributionWeights.Level) * 2;
-            potentialScore -= InjuryCalculator.GetScore(memberToSwap, member, distributionWeights.Injury) * 2;
-            
-            potentialScore += AgeCalculator.GetScore(memberToSwapWith, member, distributionWeights.Age) * 2;
-            potentialScore += PairCalculator.GetScore(memberToSwapWith, member, distributionWeights.Pair) * 2;
-            potentialScore += LevelCalculator.GetScore(memberToSwapWith, member, distributionWeights.Level) * 2;
-            potentialScore += InjuryCalculator.GetScore(memberToSwapWith, member, distributionWeights.Injury) * 2;
+            potentialScore -= GetScoreFromCalculations(memberToSwap, member) * 2;
+            potentialScore += GetScoreFromCalculations(memberToSwapWith, member) * 2;
         }
         
         return potentialScore;
     }
 
-    // int GetScoreFromCalculations()
-    // {
-    //     
-    // }
+    
+    /// <summary>
+    /// Get all the scores between 2 members from the respective calculators
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <param name="shouldScoreDouble"></param>
+    /// <returns></returns>
+    int GetScoreFromCalculations(Member a, Member b)
+    {
+        int score = 0;
+        
+        score += AgeCalculator.GetScore(a, b, distributionWeights.Age);
+        score += PairCalculator.GetScore(a, b, distributionWeights.Pair);
+        score += LevelCalculator.GetScore(a, b, distributionWeights.Level);
+        score += InjuryCalculator.GetScore(a, b, distributionWeights.Injury);
+        
+        return score;
+    }
+
+
+    /// <summary>
+    /// Remove a member from the Room and add someone else
+    /// </summary>
+    /// <param name="memberToSwap"></param>
+    /// <param name="memberToSwapWith"></param>
+    public void SwapMember(Member memberToSwap, Member memberToSwapWith)
+    {
+        if (!AllMembers.Contains(memberToSwap))
+            throw new Exception("You are trying to remove a member who is not in the room");
+        if (AllMembers.Contains(memberToSwapWith))
+            throw new Exception("You are trying to add a member who is already in the room");
+        
+        AllMembers.Remove(memberToSwap);
+        AllMembers.Add(memberToSwapWith);
+        CalculateScores();
+    }
 }

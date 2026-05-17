@@ -15,6 +15,11 @@ public class RoomPopulator(List<MemberModel> allMemberModels, RoomSeparationData
     #endregion
     
     
+    /// <summary>
+    /// The starting point for settings the members inside their appropriate rooms.
+    /// </summary>
+    /// <param name="types"></param>
+    /// <exception cref="Exception"></exception>
     public void SetRoomSeparations(List<RequirementType> types)
     {
         Console.WriteLine("______________________________");
@@ -25,7 +30,8 @@ public class RoomPopulator(List<MemberModel> allMemberModels, RoomSeparationData
 
         distributionWeights = new DistributionWeights(types);
         
-        SetRandomizedRooms();
+        CheckToSortMembers(types);
+        SetMembersToRooms();
         ImproveRooms();
         SetRoomsToSeparationDatas();
         
@@ -34,41 +40,59 @@ public class RoomPopulator(List<MemberModel> allMemberModels, RoomSeparationData
     }
     
     
-    void SetRandomizedRooms()
+    /// <summary>
+    /// If there is only 1 Requirement type, we can sort the members based on that type.
+    /// That may make the swapping later faster since the members will already be in good rooms  
+    /// </summary>
+    void CheckToSortMembers(List<RequirementType> types)
     {
-        Initialize();
-        SetMembersToRooms();
-        for (int i = 0; i < allRooms.Length; i++) allRooms[i].CalculateScores();
-        
-        void Initialize()
-        {
-            allRooms = new Room[roomSeparationDatas.Length];
-            for (int i = 0; i < allRooms.Length; i++) 
-                allRooms[i] = new Room(distributionWeights);
-        }
+        if (types.Count != 1) return;
 
-        void SetMembersToRooms()
+        switch (types[0])
         {
-            allMemberModels = allMemberModels.Shuffle().ToList();
+            case RequirementType.Age:
+                allMemberModels = allMemberModels.OrderBy(x => x.Age).ToList();
+                break;
+            case RequirementType.Level:
+                allMemberModels = allMemberModels.OrderBy(x => x.Level).ToList();
+                break;
+            default: 
+                break;
+        }        
+    }
+    
+    
+    /// <summary>
+    /// First, we add all the members inside the rooms
+    /// to have a starting point when we need to calculate scores and swap
+    /// </summary>
+    void SetMembersToRooms()
+    {
+        int memberIndex = 0;
+        allMemberModels = allMemberModels.Shuffle().ToList();
+        allRooms = new Room[roomSeparationDatas.Length];
 
-            int memberIndex = 0;
-            for (int i = 0; i < allRooms.Length; i++)
+        for (int i = 0; i < allRooms.Length; i++)
+        {
+            allRooms[i] = new Room(distributionWeights);
+            for (int j = 0; j < roomSeparationDatas[i].MembersToAdd; j++)
             {
-                for (int j = 0; j < roomSeparationDatas[i].MembersToAdd; j++)
-                {
-                    Member member = new(allMemberModels[memberIndex]);
-                    allRooms[i].AllMembers.Add(member);
-                    memberIndex++;
-                }
-                allRooms[i].SetInjuries();
+                Member member = new(allMemberModels[memberIndex]);
+                allRooms[i].AllMembers.Add(member);
+                memberIndex++;
             }
+            allRooms[i].CalculateScores();
         }
     }
 
 
+    /// <summary>
+    /// After having a starting point, now we check the rooms to find any swaps between members
+    /// </summary>
     void ImproveRooms()
     {
-        for (int i = 0; i < 100; i++)
+        const int maxAttempts = 100;
+        for (int i = 0; i < maxAttempts; i++)
         {
             CheckForSwaps(out bool hasFoundImprovement);
             if (!hasFoundImprovement)
@@ -83,6 +107,10 @@ public class RoomPopulator(List<MemberModel> allMemberModels, RoomSeparationData
     }
     
     
+    /// <summary>
+    /// Check the rooms for swaps that improve the rooms' scores
+    /// </summary>
+    /// <param name="hasFoundImprovement"></param>
     void CheckForSwaps(out bool hasFoundImprovement)
     {
         SwapCandidate? bestCandidate = null;
@@ -159,18 +187,16 @@ public class RoomPopulator(List<MemberModel> allMemberModels, RoomSeparationData
         
         void SwapRooms(Room roomA, Member memberA, Room roomB, Member memberB)
         {
-            roomA.AllMembers.Remove(memberA);
-            roomB.AllMembers.Remove(memberB);
-
-            roomA.AllMembers.Add(memberB);
-            roomB.AllMembers.Add(memberA);
-            
-            roomA.CalculateScores();
-            roomB.CalculateScores();
+            roomA.SwapMember(memberA, memberB);
+            roomB.SwapMember(memberB, memberA);
         }
     }
     
     
+    /// <summary>
+    /// Last step, since all members are in their rooms,
+    /// it's time to insert the data to the array 
+    /// </summary>
     void SetRoomsToSeparationDatas()
     {
         for (int i = 0; i < allRooms.Length; i++)
