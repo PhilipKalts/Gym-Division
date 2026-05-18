@@ -3,6 +3,7 @@
 }
 <h1>@ViewData["Title"]</h1>
 
+@using GymDivision.ScoreCalculators
 @model GymDivision.Controllers.GenerateViewModel
 
 
@@ -37,18 +38,25 @@
 </div>
 
 
-<div id="requirements" class="list-group mt-sm-3">
-    <h3>Requirements</h3>
-    <h6>Click to select / deselect requirements!</h6>
-    <h6>Drag & Drop to sort them to your needs!</h6>
-    <div class="list-group-item" data-value="0">Level</div>
-    <div class="list-group-item" data-value="1">Age</div>
-    <div class="list-group-item" data-value="2">Injury</div>
-    <div class="list-group-item" data-value="3">Pair</div>
+<div id = "weights">
+    <div>
+        <h3>Weights</h3>
+        <h6>Set the weight of each type</h6>
+    </div>
+    <div>
+        @foreach (var weightType in Enum.GetValues<WeightType>())
+        {
+            var sliderName = weightType.ToString().ToLowerInvariant();
+
+            <div class="slider-row">
+                <label for="slider_@sliderName">@weightType</label>
+                <span id="slider_value_@sliderName"></span>
+                <input id="slider_@sliderName" type="range" min="0" max="10" value="0" class="slider" />
+            </div>
+        }
+    </div>
+    
 </div>
-
-
-<script src="~/js/Sortable.min.js"></script>
 
 
 <script>
@@ -96,10 +104,14 @@
             url += "memberIds=" + member;
         }
         
-        const requirementsList = document.querySelectorAll('#requirements .list-group-item.active');
-        const requirementInts = Array.from(requirementsList).map(item => parseInt(item.dataset.value));
+        @* const requirementsList = document.querySelectorAll('#requirements .list-group-item.active'); *@
+        @* const requirementInts = Array.from(requirementsList).map(item => parseInt(item.dataset.value)); *@
+        @* *@
+        @* for (const requirementInt of requirementInts) url += "&requirements=" + requirementInt; *@
         
-        for (const requirementInt of requirementInts) url += "&requirements=" + requirementInt;
+        const weightsList = document.querySelectorAll('.slider');
+        const weights = Array.from(weightsList).map(item => parseInt(item.value));
+        for (let i = 0; i < weights.length; i++) url += "&weights=" + weights[i];
         console.log(url);
         
         fetch("/Home/Generate/Generate?" + url, {
@@ -110,7 +122,7 @@
 
     function renderRooms(rooms) {
         document.getElementById("pickMembers").style.display = "none";
-        document.getElementById("requirements").style.display = "none";
+        document.getElementById("weights").style.display = "none";
         const results = document.getElementById("results");
         results.innerHTML = "";
 
@@ -160,4 +172,18 @@
         `;
         });
     }
+</script>
+
+
+<script>
+    document.querySelectorAll(".slider").forEach(slider => {
+        const sliderName = slider.id.replace("slider_", "");
+        const output = document.getElementById("slider_value_" + sliderName);
+
+        output.innerHTML = slider.value;
+
+        slider.oninput = function () {
+            output.innerHTML = this.value;
+        };
+    });
 </script>

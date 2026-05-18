@@ -216,3 +216,4 @@ D:\Rider Projects\GymDivision\GymDivision\obj\Debug\net10.0\GymDivision.sourceli
 D:\Rider Projects\GymDivision\GymDivision\bin\Debug\net10.0\package-lock.json
 D:\Rider Projects\GymDivision\GymDivision\bin\Debug\net10.0\package.json
 D:\Rider Projects\GymDivision\GymDivision\obj\Debug\net10.0\compressed\a0rm0tj07y-{0}-rlvz8k62jr-rlvz8k62jr.gz
+D:\Rider Projects\GymDivision\GymDivision\obj\Debug\net10.0\compressed\akf2w4qgj0-{0}-7l3bzmkd7j-7l3bzmkd7j.gz

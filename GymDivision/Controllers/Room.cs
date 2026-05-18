@@ -2,25 +2,16 @@
 
 namespace GymDivision;
 
-public class Room
+public class Room(WeightData[] allWeightData)
 {
     #region Fields
 
-    public List<Member> AllMembers { get; set; }
+    public List<Member> AllMembers { get; set; } = new();
     public int Score { get; private set; }
     
-    DistributionWeights distributionWeights;
-
     #endregion
-        
-    
-    public Room(DistributionWeights distributionWeights)
-    {
-        this.distributionWeights = distributionWeights;
-        AllMembers = new List<Member>();
-    }
-        
-    
+
+
     /// <summary>
     /// Calculate the score of the room and each member inside it
     /// </summary>
@@ -80,16 +71,32 @@ public class Room
     /// </summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
-    /// <param name="shouldScoreDouble"></param>
     /// <returns></returns>
     int GetScoreFromCalculations(Member a, Member b)
     {
         int score = 0;
-        
-        score += AgeCalculator.GetScore(a, b, distributionWeights.Age);
-        score += PairCalculator.GetScore(a, b, distributionWeights.Pair);
-        score += LevelCalculator.GetScore(a, b, distributionWeights.Level);
-        score += InjuryCalculator.GetScore(a, b, distributionWeights.Injury);
+
+        for (int i = 0; i < allWeightData.Length; i++)
+        {
+            int weight = allWeightData[i].Value;
+            switch (allWeightData[i].Type)
+            {
+                case WeightType.Level:
+                    score += LevelCalculator.GetScore(a, b, weight);
+                    break;
+                case WeightType.Age:
+                    score += AgeCalculator.GetScore(a, b, weight);
+                    break;
+                case WeightType.Injury:
+                    score += InjuryCalculator.GetScore(a, b, weight);
+                    break;
+                case WeightType.Pair:
+                    score += PairCalculator.GetScore(a, b, weight);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
         
         return score;
     }

@@ -1,16 +1,20 @@
 ﻿using GymDivision.Controllers;
 using GymDivision.Models;
+using GymDivision.ScoreCalculators;
 
 namespace GymDivision.Domain;
 
-public class RoomPopulator(List<MemberModel> allMemberModels, RoomSeparationData[] roomSeparationDatas)
+public class RoomPopulator(
+    List<MemberModel> allMemberModels, 
+    RoomSeparationData[] allRoomSeparationData, 
+    WeightData[] allWeightData)
 {
     #region Fields
 
     Room[] allRooms;
     List<MemberModel> allMemberModels = allMemberModels;
-    RoomSeparationData[] roomSeparationDatas = roomSeparationDatas;
-    DistributionWeights distributionWeights;
+    RoomSeparationData[] allRoomSeparationData = allRoomSeparationData;
+    WeightData[] allWeightData = allWeightData;
     
     #endregion
     
@@ -18,21 +22,20 @@ public class RoomPopulator(List<MemberModel> allMemberModels, RoomSeparationData
     /// <summary>
     /// The starting point for settings the members inside their appropriate rooms.
     /// </summary>
-    /// <param name="types"></param>
     /// <exception cref="Exception"></exception>
-    public void SetRoomSeparations(List<RequirementType> types)
+    public void SetRoomSeparations()
     {
         Console.WriteLine("______________________________");
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-        int totalMembersInRoomSeparationDatas = roomSeparationDatas.Sum(x => x.MembersToAdd);
+        int totalMembersInRoomSeparationDatas = allRoomSeparationData.Sum(x => x.MembersToAdd);
         if (allMemberModels.Count != totalMembersInRoomSeparationDatas)
             throw new Exception("Number of members in RoomSeparationData and allMembers are not equal");
 
-        distributionWeights = new DistributionWeights(types);
-        
-        CheckToSortMembers(types);
+        bool isOnlyOneWeightActive = IsOnlyOneWeightActive(out WeightType type);
+        if (isOnlyOneWeightActive) SortMembersWithOneWeight(type);
         SetMembersToRooms();
-        ImproveRooms();
+        if (!isOnlyOneWeightActive) ImproveRooms();
+        
         SetRoomsToSeparationDatas();
         
         stopwatch.Stop();
@@ -41,24 +44,43 @@ public class RoomPopulator(List<MemberModel> allMemberModels, RoomSeparationData
     
     
     /// <summary>
-    /// If there is only 1 Requirement type, we can sort the members based on that type.
-    /// That may make the swapping later faster since the members will already be in good rooms  
+    /// If we have only 1 active weight,
+    /// the sorting can be done much faster since we do not have to calculate scores.
     /// </summary>
-    void CheckToSortMembers(List<RequirementType> types)
+    bool IsOnlyOneWeightActive(out WeightType type)
     {
-        if (types.Count != 1) return;
-
-        switch (types[0])
+        type = WeightType.Age;
+        bool hasFoundActive = false;
+        for (int i = 0; i < allWeightData.Length; i++)
         {
-            case RequirementType.Age:
+            if (allWeightData[i].Value == 0) continue;
+            // If there is more than 1 active weight return
+            if (hasFoundActive) return false;
+            
+            hasFoundActive = true;
+            type = allWeightData[i].Type;
+        }
+
+        return true;
+    }
+
+    
+    /// <summary>
+    /// If there is only 1 Weight type, we can sort the members based on that type.
+    /// That may make the swapping later faster since the members will already be in good rooms 
+    /// </summary>
+    /// <param name="type"></param>
+    void SortMembersWithOneWeight(WeightType type)
+    {
+        switch (type)
+        {
+            case WeightType.Age:
                 allMemberModels = allMemberModels.OrderBy(x => x.Age).ToList();
                 break;
-            case RequirementType.Level:
+            case WeightType.Level:
                 allMemberModels = allMemberModels.OrderBy(x => x.Level).ToList();
                 break;
-            default: 
-                break;
-        }        
+        }
     }
     
     
@@ -70,12 +92,12 @@ public class RoomPopulator(List<MemberModel> allMemberModels, RoomSeparationData
     {
         int memberIndex = 0;
         allMemberModels = allMemberModels.Shuffle().ToList();
-        allRooms = new Room[roomSeparationDatas.Length];
+        allRooms = new Room[allRoomSeparationData.Length];
 
         for (int i = 0; i < allRooms.Length; i++)
         {
-            allRooms[i] = new Room(distributionWeights);
-            for (int j = 0; j < roomSeparationDatas[i].MembersToAdd; j++)
+            allRooms[i] = new Room(allWeightData);
+            for (int j = 0; j < allRoomSeparationData[i].MembersToAdd; j++)
             {
                 Member member = new(allMemberModels[memberIndex]);
                 allRooms[i].AllMembers.Add(member);
@@ -202,7 +224,7 @@ public class RoomPopulator(List<MemberModel> allMemberModels, RoomSeparationData
         for (int i = 0; i < allRooms.Length; i++)
         {
             List<MemberModel> memberModels = allRooms[i].AllMembers.Select(x => x.Model).ToList();
-            roomSeparationDatas[i].Members = memberModels;
+            allRoomSeparationData[i].Members = memberModels;
         }
     }
 }

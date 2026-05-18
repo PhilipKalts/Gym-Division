@@ -1,10 +1,10 @@
 ﻿using GymDivision.Domain;
 using GymDivision.Models;
+using GymDivision.ScoreCalculators;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GymDivision.Controllers;
 
-public enum RequirementType { Level, Age, Injury, Pair }
 
 [Route("Home/Generate")]
 public class GenerateController : Controller
@@ -19,10 +19,10 @@ public class GenerateController : Controller
     /// Generate the rooms and members
     /// </summary>
     /// <param name="memberIds"></param>
-    /// <param name="requirements"></param>
+    /// <param name="weights"></param>
     /// <returns></returns>
     [HttpGet("Generate")]
-    public IActionResult Generate(List<int> memberIds, List<RequirementType> requirements)
+    public IActionResult Generate(List<int> memberIds, List<int> weights)
     {
         //TODO: remove after testing
         bool shouldUseNew = true;
@@ -42,10 +42,14 @@ public class GenerateController : Controller
         MemberDistributor memberDistributor = new(memberDatas.Count, roomSeparationDatas);
         memberDistributor.SetDistribution();
 
+        WeightData[] allWeightData = new WeightData[weights.Count];
+        for (int i = 0; i < weights.Count; i++)
+            allWeightData[i] = new WeightData((WeightType)i, weights[i]);
+
         if (shouldUseNew)
         {
-            RoomPopulator roomPopulator = new(memberDatas, roomSeparationDatas);
-            roomPopulator.SetRoomSeparations(requirements);
+            RoomPopulator roomPopulator = new(memberDatas, roomSeparationDatas, allWeightData);
+            roomPopulator.SetRoomSeparations();
         }
         else
         {
