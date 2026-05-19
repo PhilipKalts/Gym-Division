@@ -9,14 +9,7 @@ public class RoomPopulator(
     RoomSeparationData[] allRoomSeparationData, 
     WeightData[] allWeightData)
 {
-    #region Fields
-
     Room[] allRooms;
-    List<MemberModel> allMemberModels = allMemberModels;
-    RoomSeparationData[] allRoomSeparationData = allRoomSeparationData;
-    WeightData[] allWeightData = allWeightData;
-    
-    #endregion
     
     
     /// <summary>
@@ -135,7 +128,7 @@ public class RoomPopulator(
     /// <param name="hasFoundImprovement"></param>
     void CheckForSwaps(out bool hasFoundImprovement)
     {
-        SwapCandidate? bestCandidate = null;
+        CandidateData? bestCandidate = null;
         hasFoundImprovement = false;
         OrderRoomsByScores();
         
@@ -148,10 +141,12 @@ public class RoomPopulator(
                 for (int j = 0; j < allRooms.Length; j++)
                 {
                     if (i == j) continue;
+
+                    int numOfCandidates = (int)(allRooms[j].AllMembers.Count * 0.3f);
                     
                     List<Member> candidates = allRooms[j].AllMembers.
                         OrderBy(x => x.ScoreInRoom).
-                        Take(3).
+                        Take(numOfCandidates).
                         ToList();
                     
                     foreach (var candidate in candidates)
@@ -168,7 +163,7 @@ public class RoomPopulator(
                 SwapRooms(allRooms[i], 
                     worstMember, 
                     bestCandidate.RoomWithCandidate, 
-                    bestCandidate.Candidate);
+                    bestCandidate.Member);
                 hasFoundImprovement = true;
                 return;
             }

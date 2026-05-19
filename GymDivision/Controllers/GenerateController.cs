@@ -24,13 +24,11 @@ public class GenerateController : Controller
     [HttpGet("Generate")]
     public IActionResult Generate(List<int> memberIds, List<int> weights)
     {
-        //TODO: remove after testing
-        bool shouldUseNew = true;
-        {
-            memberIds.Clear();
-            memberIds = new List<int>();
-            for (int i = 0; i <= 18; i++) memberIds.Add(i);
-        }
+        // {
+        //     memberIds.Clear();
+        //     memberIds = new List<int>();
+        //     for (int i = 0; i <= 18; i++) memberIds.Add(i);
+        // }
         
         if (memberIds.Count == 0) return BadRequest("Member IDs cannot be null or empty");
         
@@ -46,17 +44,8 @@ public class GenerateController : Controller
         for (int i = 0; i < weights.Count; i++)
             allWeightData[i] = new WeightData((WeightType)i, weights[i]);
 
-        if (shouldUseNew)
-        {
-            RoomPopulator roomPopulator = new(memberDatas, roomSeparationDatas, allWeightData);
-            roomPopulator.SetRoomSeparations();
-        }
-        else
-        {
-            SimpleRoomPopulator simpleRoomPopulator = new(memberDatas, roomSeparationDatas);
-            simpleRoomPopulator.SetResultBasedOnLevel();
-        }
-        
+        RoomPopulator roomPopulator = new(memberDatas, roomSeparationDatas, allWeightData);
+        roomPopulator.SetRoomSeparations();
         
         return Json(roomSeparationDatas);
     }
