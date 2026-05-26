@@ -1,5 +1,11 @@
 # Gym Division
 
+This is a personal side-project where I showcase my abilities when it comes to backend developement.
+Technologies used:
+- Model-View-Controller (MVC)
+- SQLite for storing, editing database
+- Postman was used for testing endpoints
+
 Gym Division is a web app designed with fitness trainers in mind. A gym has multiple members coming in per hour and the fitness trainer is tasked to quickly evaluate which gym member should go to each room. All that happens in just a few minutes where new clients may arrive last minute or cancel their appointment. The goal of this web app is to minimize the time trainer needs to prepare the rooms down to mere seconds. This can be achieved by having 2 databases where the trainer can edit, remove & add gym members and the rooms.
 
 ## Gym member:
