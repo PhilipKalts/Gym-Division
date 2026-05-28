@@ -6,6 +6,15 @@ namespace GymDivision.Controllers;
 
 public class HomeController : Controller
 {
+    readonly RoomsContext roomsContext;
+    readonly MembersContext membersContext;
+
+    public HomeController(MembersContext membersContext, RoomsContext roomsContext)
+    {
+        this.roomsContext = roomsContext;
+        this.membersContext = membersContext;
+    }
+    
     public IActionResult Index()
     {
         return View();
@@ -18,20 +27,20 @@ public class HomeController : Controller
 
     public IActionResult Members()
     {
-        var members = new Context().Members.ToList();
+        var members = membersContext.Members.ToList();
         return View(members);
     }
     
     public IActionResult ViewRooms()
     {
-        var rooms = new RoomContext().Rooms.ToList();
+        var rooms = roomsContext.Rooms.ToList();
         return View(rooms);
     }
 
     public IActionResult Generate()
     {
-        var members = new Context().Members.ToList();
-        var rooms = new RoomContext().Rooms.ToList();
+        var rooms = roomsContext.Rooms.ToList();
+        var members = membersContext.Members.ToList();
         
         GenerateViewModel model = new(members, rooms);
         return View(model);

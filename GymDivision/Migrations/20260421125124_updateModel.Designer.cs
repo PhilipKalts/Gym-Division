@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GymDivision.Migrations
 {
-    [DbContext(typeof(Context))]
+    [DbContext(typeof(MembersContext))]
     [Migration("20260421125124_updateModel")]
     partial class updateModel
     {

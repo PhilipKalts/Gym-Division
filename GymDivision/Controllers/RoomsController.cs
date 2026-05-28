@@ -6,6 +6,13 @@ namespace GymDivision.Controllers;
 [Route("Home/Rooms")]
 public class RoomsController : Controller
 {
+    readonly RoomsContext roomsContext;
+
+    public RoomsController(RoomsContext roomsContext)
+    {
+        this.roomsContext = roomsContext;
+    }
+    
     /// <summary>
     /// Get all available rooms in the gym
     /// </summary>
@@ -13,8 +20,7 @@ public class RoomsController : Controller
     [HttpGet("GetAllRooms")]
     public IActionResult GetAllRooms()
     {
-        using var db = new RoomContext();
-        var rooms = db.Rooms.ToList();
+        var rooms = roomsContext.Rooms.ToList();
         return Ok(rooms);
     }
 
@@ -27,8 +33,7 @@ public class RoomsController : Controller
     [HttpGet("GetRoom")]
     public IActionResult GetRoom(int id)
     {
-        using var db = new RoomContext();
-        var room = db.Rooms.FirstOrDefault(x => x.Id == id);
+        var room = roomsContext.Rooms.FirstOrDefault(x => x.Id == id);
         if (room == null) return NotFound();
         return Ok(room);
     }
@@ -44,9 +49,8 @@ public class RoomsController : Controller
     {
         if (!AreValidRoomMembers()) return BadRequest();
 
-        using var db = new RoomContext();
-        db.Rooms.Add(room);
-        db.SaveChanges();
+        roomsContext.Rooms.Add(room);
+        roomsContext.SaveChanges();
         return Redirect($"/Home/ViewRooms");
         
         bool AreValidRoomMembers()
@@ -66,12 +70,11 @@ public class RoomsController : Controller
     [HttpPost("RemoveRoom")]
     public IActionResult RemoveRoom(int id)
     {
-        using var db = new RoomContext();
-        var room = db.Rooms.FirstOrDefault(x => x.Id == id);
+        var room = roomsContext.Rooms.FirstOrDefault(x => x.Id == id);
         if (room == null) return NotFound();
         
-        db.Rooms.Remove(room);
-        db.SaveChanges();
+        roomsContext.Rooms.Remove(room);
+        roomsContext.SaveChanges();
         return Ok();
     }
 
@@ -84,14 +87,13 @@ public class RoomsController : Controller
     [HttpPost("EditRoom")]
     public IActionResult EditRoom(RoomModel roomModel)
     {
-        using var db = new RoomContext();
-        var room = db.Rooms.FirstOrDefault(x => x.Id == roomModel.Id);
+        var room = roomsContext.Rooms.FirstOrDefault(x => x.Id == roomModel.Id);
         if (room == null) return NotFound();
         
         room.MinMembers = roomModel.MinMembers;
         room.MaxMembers = roomModel.MaxMembers;
         room.IdealMembers = roomModel.IdealMembers;
-        db.SaveChanges();
+        roomsContext.SaveChanges();
         
         return Redirect($"/Home/ViewRooms");
     }

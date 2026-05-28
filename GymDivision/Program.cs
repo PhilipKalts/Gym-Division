@@ -1,12 +1,27 @@
 using System.Text.Json.Serialization;
+using GymDivision.Models;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var connectionStringMembers = builder.Configuration.GetConnectionString("MembersDb");
+var connectionStringRooms = builder.Configuration.GetConnectionString("RoomsDb");
+
+builder.Services.AddDbContext<MembersContext>(options =>
+    options.UseSqlite($"Data Source={connectionStringMembers}"));
+
+builder.Services.AddDbContext<RoomsContext>(options =>
+    options.UseSqlite($"Data Source={connectionStringRooms}"));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
 });
+
+builder.Services.AddDbContext<MembersContext>(options =>
+    options.UseSqlite($"Data Source={builder.Configuration.GetConnectionString("MembersDb")}")
+);
 
 var app = builder.Build();
 

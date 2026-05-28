@@ -9,12 +9,19 @@ namespace GymDivision.Controllers;
 [Route("Home/Generate")]
 public class GenerateController : Controller
 {
-    private readonly ILogger<GenerateController> logger;
-    public GenerateController(ILogger<GenerateController> logger) => this.logger = logger;
     List<MemberModel> memberDatas;
     RoomSeparationData[] roomSeparationDatas;
 
+    readonly MembersContext membersContext;
+    readonly RoomsContext roomsContext;
+    
+    public GenerateController(MembersContext membersContext, RoomsContext roomsContext)
+    {
+        this.roomsContext = roomsContext;
+        this.membersContext = membersContext;
+    }
 
+    
     /// <summary>
     /// Generate the rooms and members
     /// </summary>
@@ -57,7 +64,7 @@ public class GenerateController : Controller
     /// <param name="memberIds"></param>
     void PopulateMemberData(List<int> memberIds)
     {
-        using var db = new Context();
+        using var db = membersContext;
         memberDatas = db.Members
             .Where(x => memberIds.Contains(x.Id))
             .OrderBy(x => x.Level)
@@ -70,7 +77,7 @@ public class GenerateController : Controller
     /// </summary>
     void PopulateTheRoomSeparationData()
     {
-        using var dbRooms = new RoomContext();
+        using var dbRooms = roomsContext;
         var allRooms = dbRooms.Rooms.ToList();
         roomSeparationDatas = new RoomSeparationData[allRooms.Count];
 

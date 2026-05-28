@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GymDivision.Migrations.Room
 {
-    [DbContext(typeof(RoomContext))]
+    [DbContext(typeof(RoomsContext))]
     partial class RoomContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

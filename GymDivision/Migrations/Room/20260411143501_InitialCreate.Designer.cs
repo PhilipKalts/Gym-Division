@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace GymDivision.Migrations.Room
 {
-    [DbContext(typeof(RoomContext))]
+    [DbContext(typeof(RoomsContext))]
     [Migration("20260411143501_InitialCreate")]
     partial class InitialCreate
     {
