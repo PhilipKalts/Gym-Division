@@ -2,9 +2,6 @@
 
 public struct MemberDistributor(int totalMembers, RoomSeparationData[] roomSeparationDatas)
 {
-    readonly int totalMembers = totalMembers;
-    RoomSeparationData[] roomSeparationDatas = roomSeparationDatas;
-    
     /// <summary>
     /// Distribute the Members to the rooms
     /// Get the results from the array which returns

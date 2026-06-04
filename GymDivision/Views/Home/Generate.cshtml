@@ -7,10 +7,12 @@
 @model GymDivision.Controllers.GenerateViewModel
 
 
-<button class="btn btn-primary mt-4" onclick="generate()">Results</button>
+<button id="btnGenerate" class="btn btn-primary mt-4" onclick="generate()">Results</button>
 
-
-<div id="results" class="mt-4"></div>
+<div id="resultsRooms">
+    <button class="btn btn-primary mt-4" onclick="returnToPickMembers()">Back</button>
+    <div id="results" class="mt-4"></div>
+</div>
 
 
 <div id="pickMembers" class="row">
@@ -23,7 +25,6 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <div><strong>@member.Name</strong></div>
-                        <div class="text-muted">Level: @member.Level</div>
                     </div>
 
                     <button id="@member.Id button" class="btn btn-outline-primary btn-sm"
@@ -104,11 +105,6 @@
             url += "memberIds=" + member;
         }
         
-        @* const requirementsList = document.querySelectorAll('#requirements .list-group-item.active'); *@
-        @* const requirementInts = Array.from(requirementsList).map(item => parseInt(item.dataset.value)); *@
-        @* *@
-        @* for (const requirementInt of requirementInts) url += "&requirements=" + requirementInt; *@
-        
         const weightsList = document.querySelectorAll('.slider');
         const weights = Array.from(weightsList).map(item => parseInt(item.value));
         for (let i = 0; i < weights.length; i++) url += "&weights=" + weights[i];
@@ -121,8 +117,7 @@
     }
 
     function renderRooms(rooms) {
-        document.getElementById("pickMembers").style.display = "none";
-        document.getElementById("weights").style.display = "none";
+        swapShownElements(true);
         const results = document.getElementById("results");
         results.innerHTML = "";
 
@@ -172,6 +167,22 @@
         `;
         });
     }
+    
+    function returnToPickMembers() {
+        swapShownElements(false);
+    }
+    
+    function swapShownElements(areResultsVisible){
+        document.getElementById("weights").style.display = areResultsVisible ? "none" : "block";
+        document.getElementById("pickMembers").style.display = areResultsVisible ? "none" : "";
+        document.getElementById("btnGenerate").style.display = areResultsVisible ? "none" : "block";
+
+        document.getElementById("resultsRooms").style.display = areResultsVisible ? "block" : "none";
+    }
+    
+    document.addEventListener("DOMContentLoaded", () => {
+        swapShownElements(false);
+    });
 </script>
 
 
