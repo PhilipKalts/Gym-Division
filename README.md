@@ -6,7 +6,7 @@ Technologies used:
 - SQLite for the databases
 - Postman was used for testing the endpoints
 
-Gym Division is a web app designed with fitness trainers in mind. A gym has multiple members coming in per hour and the fitness trainer is tasked to quickly evaluate which gym member should go to each room. All that happens while new members may arrive last second or cancel their appointment. Furthermore, it is important to point out there may be multiple factors for the division of the members. Age, fitness level, injuries or pairs are some which may effect the result. The goal of this web app is to minimize the time a trainer needs to prepare the rooms down to mere seconds. By having all of the information of the rooms, selecting which members are in the gym at the time and lastly setting the parameters the trainer will get the best possible result.
+Gym Division is a web app designed with fitness trainers in mind. A gym has multiple members coming in per hour and the fitness trainer is tasked to quickly evaluate which gym member should go to each room. Furthermore, it is important to point out there may be multiple factors for the division of the members. Age, fitness level, injuries or pairs are some which may effect the result. The goal of this web app is to minimize the time a trainer needs to finalize the room members down to mere seconds. By having all of the information of the rooms, selecting which members are in the gym at the time and lastly setting the parameters the trainer will get the best possible result.
 
 ## Databases
 SQLite was used for the databases, one for the rooms and one for the members.
@@ -28,11 +28,11 @@ SQLite was used for the databases, one for the rooms and one for the members.
  - Fitness level
  - Age
  - Injuries
- - Pairs (some members may want to be in the same room with other members)
+ - Pairs of members (some members may want to be in the same room with other members)
 Worth pointing out, each parameter may have different weight to it. The user has the freedom to adjust the weight of each parameter with a slider.
 
 ## Using the Web app 
-The trainer has added all of the gym members and the rooms with their information in the databases via their appropriate pages. When it is time to generate the room, they navigate to the according page where the gym members can be selected. Afterwards, they can set the weight of each parameter and press "generate" which will return the results.
+The trainer has added all of the gym members and the rooms with their information in the databases via their appropriate pages. When it is time to generate the room, they navigate to the appropriate page where the gym members can be selected. Afterwards, they can set the weight of each parameter and press "generate" which will return the results.
 
 ## How the system works:
 There are 2 things which the system has to take care of:
